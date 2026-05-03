@@ -416,6 +416,12 @@ export function RiskModal({ risk, onClose }: RiskModalProps) {
       {/* Drawers */}
       {showLimitDrawer && <LimitDrawer onClose={() => setShowLimitDrawer(false)} />}
       {showKriDrawer && <KriDrawer onClose={() => setShowKriDrawer(false)} />}
+      {showDataDrawer && (
+        <DataVerificationDrawer
+          onClose={() => setShowDataDrawer(false)}
+          onOpenProfile={() => { onClose(); navigate({ to: "/profile" }); }}
+        />
+      )}
     </div>
   );
 }
