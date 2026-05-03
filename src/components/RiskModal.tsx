@@ -1,8 +1,11 @@
-import { X, ChevronRight, ChevronLeft, Edit, AlertTriangle, Shield, Info, Calendar, Users, Maximize2 } from "lucide-react";
+import { X, ChevronRight, ChevronLeft, Edit, AlertTriangle, Shield, Info, Calendar, Users, Maximize2, Check, Clock, XCircle, FileText, Bot, User as UserIcon } from "lucide-react";
 import type { Risk } from "../data/mockData";
 import { useState } from "react";
 import { LimitDrawer } from "./LimitDrawer";
 import { KriDrawer } from "./KriDrawer";
+import { DataVerificationDrawer } from "./DataVerificationDrawer";
+import { riskEvidenceAttributes } from "../data/companyProfileData";
+import { useNavigate } from "@tanstack/react-router";
 
 interface RiskModalProps {
   risk: Risk;
