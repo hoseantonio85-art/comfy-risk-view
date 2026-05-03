@@ -20,6 +20,7 @@ const navItems = [
   { icon: Home, label: "Главная", to: "/" },
   { icon: Calendar, label: "События", to: "#" },
   { icon: AlertTriangle, label: "Риски", to: "/risks" },
+  { icon: Building2, label: "Профиль компании", to: "/profile" },
   { icon: Shield, label: "Меры", to: "#" },
   { icon: BarChart3, label: "Аналитика", to: "#" },
   { icon: Bot, label: "AI мониторинг", to: "#" },
