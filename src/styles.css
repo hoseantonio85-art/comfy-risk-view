@@ -57,6 +57,9 @@
   --color-norm-coral-light: var(--norm-coral-light);
   --color-norm-mint: var(--norm-mint);
   --color-norm-purple-light: var(--norm-purple-light);
+  --color-norm-purple: var(--norm-purple);
+  --color-norm-iris: var(--norm-iris);
+  --color-norm-iris-light: var(--norm-iris-light);
 }
 
 :root {
@@ -107,6 +110,9 @@
   --norm-coral-light: oklch(0.96 0.03 30);
   --norm-mint: oklch(0.92 0.04 170);
   --norm-purple-light: oklch(0.93 0.04 300);
+  --norm-purple: oklch(0.55 0.2 300);
+  --norm-iris: oklch(0.58 0.2 290);
+  --norm-iris-light: oklch(0.94 0.04 290);
 }
 
 @layer base {
