@@ -16,6 +16,8 @@ export function RiskModal({ risk, onClose }: RiskModalProps) {
   const [activeTab, setActiveTab] = useState<"assessment" | "measures">("assessment");
   const [showLimitDrawer, setShowLimitDrawer] = useState(false);
   const [showKriDrawer, setShowKriDrawer] = useState(false);
+  const [showDataDrawer, setShowDataDrawer] = useState(false);
+  const navigate = useNavigate();
 
   const levelColor = risk.level === "Высокий" ? "text-norm-red" : risk.level === "Средний" ? "text-norm-orange" : "text-norm-green";
   const levelDot = risk.level === "Высокий" ? "bg-norm-red" : risk.level === "Средний" ? "bg-norm-orange" : "bg-norm-green";
