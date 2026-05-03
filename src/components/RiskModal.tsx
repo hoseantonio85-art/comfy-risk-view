@@ -1,8 +1,11 @@
-import { X, ChevronRight, ChevronLeft, Edit, AlertTriangle, Shield, Info, Calendar, Users, Maximize2 } from "lucide-react";
+import { X, ChevronRight, ChevronLeft, Edit, AlertTriangle, Shield, Info, Calendar, Users, Maximize2, Check, Clock, XCircle, FileText, Bot, User as UserIcon } from "lucide-react";
 import type { Risk } from "../data/mockData";
 import { useState } from "react";
 import { LimitDrawer } from "./LimitDrawer";
 import { KriDrawer } from "./KriDrawer";
+import { DataVerificationDrawer } from "./DataVerificationDrawer";
+import { riskEvidenceAttributes } from "../data/companyProfileData";
+import { useNavigate } from "@tanstack/react-router";
 
 interface RiskModalProps {
   risk: Risk;
@@ -13,6 +16,8 @@ export function RiskModal({ risk, onClose }: RiskModalProps) {
   const [activeTab, setActiveTab] = useState<"assessment" | "measures">("assessment");
   const [showLimitDrawer, setShowLimitDrawer] = useState(false);
   const [showKriDrawer, setShowKriDrawer] = useState(false);
+  const [showDataDrawer, setShowDataDrawer] = useState(false);
+  const navigate = useNavigate();
 
   const levelColor = risk.level === "Высокий" ? "text-norm-red" : risk.level === "Средний" ? "text-norm-orange" : "text-norm-green";
   const levelDot = risk.level === "Высокий" ? "bg-norm-red" : risk.level === "Средний" ? "bg-norm-orange" : "bg-norm-green";
@@ -124,6 +129,74 @@ export function RiskModal({ risk, onClose }: RiskModalProps) {
                   <div className="text-sm font-bold text-foreground">3 420 000 ₽</div>
                 </div>
               </div>
+            </div>
+
+            {/* Основания вывода */}
+            <div className="rounded-xl border border-border p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-foreground">Основания вывода</h3>
+                {(() => {
+                  const missing = riskEvidenceAttributes.filter(a => a.status === "missing").length;
+                  const unverified = riskEvidenceAttributes.filter(a => a.status === "unverified" || a.status === "outdated").length;
+                  if (missing > 0) return (
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-norm-red-light text-norm-red text-xs font-medium">
+                      <XCircle className="w-3.5 h-3.5" /> Критические поля не заполнены
+                    </div>
+                  );
+                  if (unverified > 0) return (
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-norm-yellow-light text-norm-yellow text-xs font-medium">
+                      <Clock className="w-3.5 h-3.5" /> Часть данных не подтверждена
+                    </div>
+                  );
+                  return (
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-norm-green-light text-norm-green text-xs font-medium">
+                      <Check className="w-3.5 h-3.5" /> Данные верифицированы
+                    </div>
+                  );
+                })()}
+              </div>
+
+              <div className="space-y-2 mb-4">
+                {riskEvidenceAttributes.slice(0, 4).map((attr) => {
+                  const stCfg: Record<string, {color: string; icon: typeof Check}> = {
+                    verified: { color: "text-norm-green", icon: Check },
+                    unverified: { color: "text-norm-orange", icon: Clock },
+                    outdated: { color: "text-norm-yellow", icon: Clock },
+                    missing: { color: "text-norm-red", icon: XCircle },
+                  };
+                  const srcCfg: Record<string, {label: string; icon: typeof Bot}> = {
+                    agent: { label: "Агент", icon: Bot },
+                    registry: { label: "Реестр", icon: FileText },
+                    user: { label: "Пользователь", icon: UserIcon },
+                    document: { label: "Документ", icon: FileText },
+                  };
+                  const st = stCfg[attr.status];
+                  const src = srcCfg[attr.source];
+                  const StI = st.icon;
+                  const SrI = src.icon;
+                  return (
+                    <div key={attr.id} className="flex items-center gap-3 py-2 px-3 rounded-lg hover:bg-accent/50 transition-colors">
+                      <StI className={`w-4 h-4 flex-shrink-0 ${st.color}`} />
+                      <div className="flex-1 min-w-0">
+                        <span className="text-sm text-foreground">{attr.name}</span>
+                        <span className="text-sm text-muted-foreground ml-2">{attr.value}</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                        <SrI className="w-3 h-3" />
+                        {src.label}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <button
+                onClick={() => setShowDataDrawer(true)}
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
+              >
+                <Shield className="w-4 h-4" />
+                Проверить данные
+              </button>
             </div>
 
             {/* Limit utilization */}
@@ -343,6 +416,12 @@ export function RiskModal({ risk, onClose }: RiskModalProps) {
       {/* Drawers */}
       {showLimitDrawer && <LimitDrawer onClose={() => setShowLimitDrawer(false)} />}
       {showKriDrawer && <KriDrawer onClose={() => setShowKriDrawer(false)} />}
+      {showDataDrawer && (
+        <DataVerificationDrawer
+          onClose={() => setShowDataDrawer(false)}
+          onOpenProfile={() => { onClose(); navigate({ to: "/profile" }); }}
+        />
+      )}
     </div>
   );
 }
