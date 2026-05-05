@@ -1,20 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Search, SlidersHorizontal, Sparkles, Info, ChevronDown, ChevronRight } from "lucide-react";
 import { mockRisks, mockAnalyses } from "../data/mockData";
 import { RiskModal } from "../components/RiskModal";
 import { AnalysisModal } from "../components/AnalysisModal";
 import type { Risk, RiskAnalysis } from "../data/mockData";
-
-export const Route = createFileRoute("/risks")({
-  component: RisksPage,
-  head: () => ({
-    meta: [
-      { title: "Риски — НОРМ" },
-      { name: "description", content: "Список рисков" },
-    ],
-  }),
-});
 
 const tabs = ["Активные риски", "Анализ рисков", "Архив"] as const;
 
@@ -24,7 +13,7 @@ const counterCards = [
   { label: "Переоценено", count: 2, color: "bg-norm-coral", desc: "Норм скорректировал оценку риска на основе новых данных." },
 ];
 
-function RisksPage() {
+export default function RisksPage() {
   const [activeTab, setActiveTab] = useState<typeof tabs[number]>("Активные риски");
   const [selectedRisk, setSelectedRisk] = useState<Risk | null>(null);
   const [selectedAnalysis, setSelectedAnalysis] = useState<RiskAnalysis | null>(null);
@@ -37,7 +26,6 @@ function RisksPage() {
 
   return (
     <div className="p-6 lg:p-8 max-w-[1100px]">
-      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-bold text-foreground">— Все риски</h1>
@@ -59,7 +47,6 @@ function RisksPage() {
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="flex items-center gap-1 mb-6 border-b border-border">
         {tabs.map((tab) => (
           <button
@@ -78,7 +65,6 @@ function RisksPage() {
 
       {activeTab === "Активные риски" && (
         <>
-          {/* Counter cards */}
           <div className="grid grid-cols-3 gap-4 mb-6">
             {counterCards.map((card) => (
               <div key={card.label} className="rounded-2xl border border-border p-5 bg-card relative">
@@ -93,7 +79,6 @@ function RisksPage() {
             ))}
           </div>
 
-          {/* Risk list */}
           <div className="space-y-3">
             {mockRisks.map((risk) => (
               <RiskCard key={risk.id} risk={risk} onClick={() => setSelectedRisk(risk)} />
@@ -116,7 +101,6 @@ function RisksPage() {
         </div>
       )}
 
-      {/* FAB */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3">
         <button className="flex items-center gap-2 px-6 py-3 rounded-full bg-norm-green text-primary-foreground shadow-lg hover:opacity-90 transition-opacity text-sm font-medium">
           Зарегистрировать риск
@@ -130,7 +114,6 @@ function RisksPage() {
         </button>
       </div>
 
-      {/* Modals */}
       {selectedRisk && (
         <RiskModal
           risk={selectedRisk}

@@ -1,9 +1,9 @@
-// vite.config.ts
-import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
+import tsconfigPaths from "vite-tsconfig-paths";
 
-export default defineConfig(({ mode }) => {
-  return {
-    base: mode === 'production' ? '/comfy-risk-view/' : '/',
-    // Убираем tanstackStart.prerender — настройки теперь в app.config.ts
-  };
-});
+export default defineConfig(({ mode }) => ({
+  base: mode === "production" ? "/comfy-risk-view/" : "/",
+  plugins: [react(), tailwindcss(), tsconfigPaths()],
+}));

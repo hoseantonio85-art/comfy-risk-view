@@ -1,16 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { Bell, ChevronRight, Sparkles } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
-
-export const Route = createFileRoute("/")({
-  component: HomePage,
-  head: () => ({
-    meta: [
-      { title: "Главная — НОРМ" },
-      { name: "description", content: "Дашборд управления рисками" },
-    ],
-  }),
-});
 
 const donutData = [
   { name: "Законодательство и регуляторы", value: 538, color: "#e8b84d" },
@@ -64,7 +53,7 @@ const newsItems = [
   },
 ];
 
-function HomePage() {
+export default function HomePage() {
   return (
     <div className="p-6 lg:p-8 max-w-[1400px]">
       {/* Header */}
@@ -98,7 +87,6 @@ function HomePage() {
             </div>
 
             <div className="relative flex items-center justify-center">
-              {/* Category labels around chart */}
               <div className="relative w-full max-w-[500px] aspect-square">
                 <div className="absolute inset-0 flex items-center justify-center">
                   <ResponsiveContainer width={260} height={260}>
@@ -121,7 +109,6 @@ function HomePage() {
                   </ResponsiveContainer>
                 </div>
 
-                {/* Labels around the chart */}
                 {donutData.map((item, i) => {
                   const positions = [
                     { top: "5%", left: "35%" },
@@ -149,7 +136,6 @@ function HomePage() {
               </div>
             </div>
 
-            {/* Legend */}
             <div className="flex items-center gap-6 mt-4 justify-center">
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <div className="w-3 h-3 rounded-sm bg-norm-yellow opacity-50" />
@@ -200,7 +186,6 @@ function HomePage() {
 
         {/* Right column */}
         <div className="w-[320px] flex-shrink-0 space-y-4">
-          {/* What's happening */}
           <div className="bg-card rounded-2xl border border-border p-5">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
@@ -233,7 +218,6 @@ function HomePage() {
               </div>
             </div>
 
-            {/* Attention zones */}
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold text-sm text-foreground">Зоны внимания</h3>
               <span className="text-xs text-muted-foreground">30 дней</span>
@@ -253,7 +237,6 @@ function HomePage() {
             </div>
           </div>
 
-          {/* High risks */}
           <div className="bg-card rounded-2xl border border-border p-5">
             <h3 className="font-semibold text-sm text-foreground mb-1">
               Высокие риски без мер <span className="font-normal text-muted-foreground">6 из 18</span>

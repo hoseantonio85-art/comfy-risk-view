@@ -1,5 +1,5 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   TrendingUp, Building2, Settings, Scale, Users, AlertTriangle,
   Check, Clock, XCircle, FileText, Bot, User, Upload, MessageSquare,
@@ -7,16 +7,6 @@ import {
 } from "lucide-react";
 import { profileAreas, companyName, type ProfileArea, type ProfileAttribute } from "../data/companyProfileData";
 import { NormFab } from "../components/NormFab";
-
-export const Route = createFileRoute("/profile")({
-  head: () => ({
-    meta: [
-      { title: "Профиль компании — НОРМ" },
-      { name: "description", content: "Профиль компании — база структурированных знаний" },
-    ],
-  }),
-  component: ProfilePage,
-});
 
 const iconMap: Record<string, React.ComponentType<any>> = {
   TrendingUp, Building2, Settings, Scale, Users, AlertTriangle,
@@ -36,7 +26,7 @@ const sourceConfig = {
   document: { label: "Документ", icon: FileText },
 };
 
-function ProfilePage() {
+export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<"card" | "map" | "facts" | "processes">("map");
   const [selectedArea, setSelectedArea] = useState<ProfileArea | null>(null);
   const navigate = useNavigate();
@@ -54,7 +44,6 @@ function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Page header */}
       <div className="bg-card border-b border-border px-8 pt-8 pb-0">
         <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1.5">
           <span>Главная</span>
@@ -64,7 +53,6 @@ function ProfilePage() {
         <h1 className="text-2xl font-bold text-foreground mb-1">— {companyName}</h1>
         <p className="text-sm text-muted-foreground mb-5">База структурированных знаний о компании</p>
 
-        {/* Summary */}
         <div className="grid grid-cols-4 gap-4 mb-5">
           <SummaryCard
             icon={
@@ -100,11 +88,10 @@ function ProfilePage() {
             label="Влияет на риски"
             value="3 активных риска"
             clickable
-            onClick={() => navigate({ to: "/risks" })}
+            onClick={() => navigate("/risks")}
           />
         </div>
 
-        {/* Tabs */}
         <div className="flex gap-1">
           {tabs.map((tab) => (
             <button
@@ -122,7 +109,6 @@ function ProfilePage() {
         </div>
       </div>
 
-      {/* Content */}
       <div className="px-8 py-6">
         {activeTab === "map" && !selectedArea && <ProfileMap onSelectArea={setSelectedArea} />}
         {activeTab === "map" && selectedArea && (
@@ -133,7 +119,7 @@ function ProfilePage() {
         {activeTab === "processes" && <PlaceholderTab title="Процессы" />}
       </div>
 
-      <NormFab onOpenProfile={() => navigate({ to: "/profile" })} />
+      <NormFab onOpenProfile={() => navigate("/profile")} />
     </div>
   );
 }
@@ -194,7 +180,6 @@ function ProfileMap({ onSelectArea }: { onSelectArea: (area: ProfileArea) => voi
 
             <p className="text-xs text-muted-foreground leading-relaxed">{area.description}</p>
 
-            {/* Progress */}
             {area.state !== "empty" && (
               <div className="flex items-center gap-2">
                 <div className="flex-1 h-1.5 bg-border rounded-full overflow-hidden">
@@ -209,7 +194,6 @@ function ProfileMap({ onSelectArea }: { onSelectArea: (area: ProfileArea) => voi
               </div>
             )}
 
-            {/* Status line */}
             <div className={`text-xs font-medium ${style.accent}`}>
               {area.state === "reliable" && `✓ Верифицировано · обновлено ${area.updatedAgo}`}
               {area.state === "attention" && `⚠ ${area.pendingCount} атрибутов ждут подтверждения`}
@@ -217,7 +201,6 @@ function ProfileMap({ onSelectArea }: { onSelectArea: (area: ProfileArea) => voi
               {area.state === "empty" && `○ Нет данных · загрузить документ или заполнить`}
             </div>
 
-            {/* Action */}
             <div className="mt-auto pt-1">
               {area.state === "attention" && area.pendingCount && (
                 <span className="text-xs font-semibold text-norm-green">Подтвердить ({area.pendingCount}) →</span>
@@ -373,7 +356,6 @@ function CardTab() {
 
   return (
     <div>
-      {/* Chip navigation */}
       <div className="flex gap-2 mb-6 flex-wrap sticky top-0 bg-background py-2 z-10">
         {sections.map((s) => (
           <button
