@@ -419,7 +419,7 @@ export function RiskModal({ risk, onClose }: RiskModalProps) {
       {showDataDrawer && (
         <DataVerificationDrawer
           onClose={() => setShowDataDrawer(false)}
-          onOpenProfile={() => { onClose(); navigate({ to: "/profile" }); }}
+          onOpenProfile={() => { onClose(); navigate("/profile"); }}
         />
       )}
     </div>
