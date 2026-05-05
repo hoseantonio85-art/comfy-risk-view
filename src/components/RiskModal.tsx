@@ -5,7 +5,7 @@ import { LimitDrawer } from "./LimitDrawer";
 import { KriDrawer } from "./KriDrawer";
 import { DataVerificationDrawer } from "./DataVerificationDrawer";
 import { riskEvidenceAttributes } from "../data/companyProfileData";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "react-router-dom";
 
 interface RiskModalProps {
   risk: Risk;
