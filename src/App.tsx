@@ -4,12 +4,6 @@ import HomePage from "./pages/HomePage";
 import RisksPage from "./pages/RisksPage";
 import ProfilePage from "./pages/ProfilePage";
 
-// LOVABLE_KEEP_START
-// Не изменять этот блок: специфическая настройка basename для GitHub Pages
-const isGitHubPages = window.location.hostname.includes("github.io");
-const basename = isGitHubPages ? "/comfy-risk-view" : "";
-// LOVABLE_KEEP_END
-
 function NotFound() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -29,9 +23,6 @@ export default function App() {
     <div className="flex min-h-screen bg-background">
       <Sidebar />
       <main className="flex-1 min-w-0 overflow-y-auto">
-      {/* LOVABLE_KEEP_START */}
-      <BrowserRouter basename={basename}>
-      {/* LOVABLE_KEEP_END */}
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/risks" element={<RisksPage />} />
