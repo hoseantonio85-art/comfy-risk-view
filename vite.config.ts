@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
-  base: 'comfy-risk-view',
+  base: mode === 'production' ? '/comfy-risk-view/' : '/',
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
