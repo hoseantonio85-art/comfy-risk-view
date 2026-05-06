@@ -3,8 +3,8 @@ import type { Risk } from "../data/mockData";
 import { useState } from "react";
 import { LimitDrawer } from "./LimitDrawer";
 import { KriDrawer } from "./KriDrawer";
-import { DataVerificationDrawer } from "./DataVerificationDrawer";
-import { riskEvidenceAttributes } from "../data/companyProfileData";
+import { InlineEvidenceDrawer } from "./DataVerificationDrawer";
+import { riskEvidenceSources, type EvidenceSource } from "../data/companyProfileData";
 import { useNavigate } from "react-router-dom";
 
 interface RiskModalProps {
@@ -16,7 +16,7 @@ export function RiskModal({ risk, onClose }: RiskModalProps) {
   const [activeTab, setActiveTab] = useState<"assessment" | "measures">("assessment");
   const [showLimitDrawer, setShowLimitDrawer] = useState(false);
   const [showKriDrawer, setShowKriDrawer] = useState(false);
-  const [showDataDrawer, setShowDataDrawer] = useState(false);
+  const [activeSource, setActiveSource] = useState<EvidenceSource | null>(null);
   const navigate = useNavigate();
 
   const levelColor = risk.level === "Высокий" ? "text-norm-red" : risk.level === "Средний" ? "text-norm-orange" : "text-norm-green";
@@ -26,7 +26,6 @@ export function RiskModal({ risk, onClose }: RiskModalProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-foreground/30 backdrop-blur-sm" onClick={onClose} />
 
-      {/* Nav arrows */}
       <button className="absolute left-4 top-1/2 -translate-y-1/2 z-50 w-10 h-10 rounded-full bg-card shadow-lg flex items-center justify-center hover:bg-accent transition-colors">
         <ChevronLeft className="w-5 h-5 text-muted-foreground" />
       </button>
@@ -34,9 +33,9 @@ export function RiskModal({ risk, onClose }: RiskModalProps) {
         <ChevronRight className="w-5 h-5 text-muted-foreground" />
       </button>
 
-      <div className="relative z-10 bg-card rounded-2xl shadow-2xl w-full max-w-[900px] max-h-[90vh] overflow-y-auto mx-16">
+      <div className="relative z-10 bg-card rounded-2xl shadow-2xl w-full max-w-[900px] max-h-[90vh] overflow-hidden mx-16 flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 bg-card z-10 px-8 pt-6 pb-4 border-b border-border">
+        <div className="bg-card z-10 px-8 pt-6 pb-4 border-b border-border flex-shrink-0">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-xs text-muted-foreground">Риск</span>
             <span className="text-xs font-medium text-norm-green bg-norm-green-light px-2 py-0.5 rounded">Активен</span>
@@ -71,22 +70,17 @@ export function RiskModal({ risk, onClose }: RiskModalProps) {
           </div>
         </div>
 
-        <div className="flex">
+        <div className="flex flex-1 overflow-hidden">
           {/* Main content */}
-          <div className="flex-1 px-8 py-6 space-y-6">
+          <div className="flex-1 px-8 py-6 space-y-6 overflow-y-auto">
             {/* Risk level */}
             <div className="rounded-xl border border-border p-5">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-foreground">Уровень риска</h3>
-                  <div className={`flex items-center gap-1.5`}>
-                    <div className={`w-2 h-2 rounded-full ${levelDot}`} />
-                    <span className={`text-sm ${levelColor}`}>{risk.level}</span>
-                  </div>
+              <div className="flex items-center gap-2 mb-4">
+                <h3 className="font-semibold text-foreground">Уровень риска</h3>
+                <div className="flex items-center gap-1.5">
+                  <div className={`w-2 h-2 rounded-full ${levelDot}`} />
+                  <span className={`text-sm ${levelColor}`}>{risk.level}</span>
                 </div>
-                <button className="text-sm text-norm-green font-medium hover:underline flex items-center gap-1">
-                  Источник анализа <ChevronRight className="w-3 h-3" />
-                </button>
               </div>
 
               <div className="grid grid-cols-3 gap-3 mb-4">
@@ -131,72 +125,33 @@ export function RiskModal({ risk, onClose }: RiskModalProps) {
               </div>
             </div>
 
-            {/* Основания вывода */}
+            {/* AI Evidence Message (replaces old table) */}
             <div className="rounded-xl border border-border p-5">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-foreground">Основания вывода</h3>
-                {(() => {
-                  const missing = riskEvidenceAttributes.filter(a => a.status === "missing").length;
-                  const unverified = riskEvidenceAttributes.filter(a => a.status === "unverified" || a.status === "outdated").length;
-                  if (missing > 0) return (
-                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-norm-red-light text-norm-red text-xs font-medium">
-                      <XCircle className="w-3.5 h-3.5" /> Критические поля не заполнены
-                    </div>
-                  );
-                  if (unverified > 0) return (
-                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-norm-yellow-light text-norm-yellow text-xs font-medium">
-                      <Clock className="w-3.5 h-3.5" /> Часть данных не подтверждена
-                    </div>
-                  );
-                  return (
-                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-norm-green-light text-norm-green text-xs font-medium">
-                      <Check className="w-3.5 h-3.5" /> Данные верифицированы
-                    </div>
-                  );
-                })()}
+              <h3 className="font-semibold text-foreground mb-3">Основания вывода</h3>
+              <div className="flex items-start gap-3 rounded-xl px-4 py-3.5 mb-3" style={{ background: "rgba(123, 107, 241, 0.06)" }}>
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: "rgba(123, 107, 241, 0.12)" }}>
+                  <Bot className="w-4 h-4" style={{ color: "#7B6BF1" }} />
+                </div>
+                <p className="text-sm leading-relaxed text-foreground">
+                  Оценка основана на финансовых данных компании: выручка снизилась на 18% г/г, долговая нагрузка выросла. Данные верифицированы. Регуляторный раздел не заполнен — это снижает точность.
+                </p>
               </div>
-
-              <div className="space-y-2 mb-4">
-                {riskEvidenceAttributes.slice(0, 4).map((attr) => {
-                  const stCfg: Record<string, {color: string; icon: typeof Check}> = {
-                    verified: { color: "text-norm-green", icon: Check },
-                    unverified: { color: "text-norm-orange", icon: Clock },
-                    outdated: { color: "text-norm-yellow", icon: Clock },
-                    missing: { color: "text-norm-red", icon: XCircle },
-                  };
-                  const srcCfg: Record<string, {label: string; icon: typeof Bot}> = {
-                    agent: { label: "Агент", icon: Bot },
-                    registry: { label: "Реестр", icon: FileText },
-                    user: { label: "Пользователь", icon: UserIcon },
-                    document: { label: "Документ", icon: FileText },
-                  };
-                  const st = stCfg[attr.status];
-                  const src = srcCfg[attr.source];
-                  const StI = st.icon;
-                  const SrI = src.icon;
-                  return (
-                    <div key={attr.id} className="flex items-center gap-3 py-2 px-3 rounded-lg hover:bg-accent/50 transition-colors">
-                      <StI className={`w-4 h-4 flex-shrink-0 ${st.color}`} />
-                      <div className="flex-1 min-w-0">
-                        <span className="text-sm text-foreground">{attr.name}</span>
-                        <span className="text-sm text-muted-foreground ml-2">{attr.value}</span>
-                      </div>
-                      <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                        <SrI className="w-3 h-3" />
-                        {src.label}
-                      </div>
-                    </div>
-                  );
-                })}
+              <div className="flex flex-wrap gap-2">
+                {riskEvidenceSources.map(src => (
+                  <button
+                    key={src.id}
+                    onClick={() => setActiveSource(src)}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
+                      activeSource?.id === src.id
+                        ? "border-[#7B6BF1] bg-[#7B6BF1]/10 text-[#7B6BF1]"
+                        : "border-border text-muted-foreground hover:text-foreground hover:bg-accent"
+                    }`}
+                  >
+                    <FileText className="w-3 h-3" />
+                    {src.name}
+                  </button>
+                ))}
               </div>
-
-              <button
-                onClick={() => setShowDataDrawer(true)}
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
-              >
-                <Shield className="w-4 h-4" />
-                Проверить данные
-              </button>
             </div>
 
             {/* Limit utilization */}
@@ -366,62 +321,64 @@ export function RiskModal({ risk, onClose }: RiskModalProps) {
             </div>
           </div>
 
-          {/* Right sidebar */}
-          <div className="w-[240px] border-l border-border px-5 py-6 space-y-5 flex-shrink-0">
-            <div>
-              <h4 className="font-semibold text-sm text-foreground mb-3">Информация</h4>
-              <div className="space-y-2 text-xs">
-                <div className="flex justify-between"><span className="text-muted-foreground">Риск</span><span className="text-foreground font-medium">RSK-41242001</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Создан</span><span className="text-foreground">{risk.createdAt}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Обновлён</span><span className="text-foreground">{risk.updatedAt}</span></div>
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Автор</span>
-                  <div className="flex items-center gap-1">
-                    <div className="w-4 h-4 rounded-full bg-norm-green" />
-                    <span className="text-foreground">NORM AI</span>
+          {/* Right sidebar OR Evidence Drawer */}
+          {activeSource ? (
+            <InlineEvidenceDrawer
+              source={activeSource}
+              onClose={() => setActiveSource(null)}
+              onOpenProfile={() => { onClose(); navigate("/profile"); }}
+            />
+          ) : (
+            <div className="w-[240px] border-l border-border px-5 py-6 space-y-5 flex-shrink-0 overflow-y-auto">
+              <div>
+                <h4 className="font-semibold text-sm text-foreground mb-3">Информация</h4>
+                <div className="space-y-2 text-xs">
+                  <div className="flex justify-between"><span className="text-muted-foreground">Риск</span><span className="text-foreground font-medium">RSK-41242001</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Создан</span><span className="text-foreground">{risk.createdAt}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Обновлён</span><span className="text-foreground">{risk.updatedAt}</span></div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Автор</span>
+                    <div className="flex items-center gap-1">
+                      <div className="w-4 h-4 rounded-full bg-norm-green" />
+                      <span className="text-foreground">NORM AI</span>
+                    </div>
                   </div>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Источник</span>
-                  <div className="flex items-center gap-1">
-                    <div className="w-4 h-4 rounded-full bg-primary/20" />
-                    <span className="text-foreground">{risk.source}</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Источник</span>
+                    <div className="flex items-center gap-1">
+                      <div className="w-4 h-4 rounded-full bg-primary/20" />
+                      <span className="text-foreground">{risk.source}</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div>
-              <h4 className="font-semibold text-sm text-foreground mb-2">Объект оценки</h4>
-              <div className="flex items-center gap-1.5 text-xs">
-                <div className="w-3 h-3 rounded-full bg-norm-green" />
-                <span className="text-foreground">Проект</span>
+              <div>
+                <h4 className="font-semibold text-sm text-foreground mb-2">Объект оценки</h4>
+                <div className="flex items-center gap-1.5 text-xs">
+                  <div className="w-3 h-3 rounded-full bg-norm-green" />
+                  <span className="text-foreground">Проект</span>
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">Петрушкины истории и многое ...</div>
               </div>
-              <div className="text-xs text-muted-foreground mt-1">Петрушкины истории и многое ...</div>
+
+              <button className="w-full flex items-center justify-between py-3 border-t border-b border-border text-sm">
+                <span className="text-foreground font-medium">История изменений</span>
+                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+              </button>
+
+              <button className="w-full flex items-center justify-between py-3 border-b border-border text-sm">
+                <span className="text-foreground font-medium">Добавить меру</span>
+                <span className="text-muted-foreground text-lg">+</span>
+              </button>
             </div>
-
-            <button className="w-full flex items-center justify-between py-3 border-t border-b border-border text-sm">
-              <span className="text-foreground font-medium">История изменений</span>
-              <ChevronRight className="w-4 h-4 text-muted-foreground" />
-            </button>
-
-            <button className="w-full flex items-center justify-between py-3 border-b border-border text-sm">
-              <span className="text-foreground font-medium">Добавить меру</span>
-              <span className="text-muted-foreground text-lg">+</span>
-            </button>
-          </div>
+          )}
         </div>
       </div>
 
-      {/* Drawers */}
+      {/* External Drawers */}
       {showLimitDrawer && <LimitDrawer onClose={() => setShowLimitDrawer(false)} />}
       {showKriDrawer && <KriDrawer onClose={() => setShowKriDrawer(false)} />}
-      {showDataDrawer && (
-        <DataVerificationDrawer
-          onClose={() => setShowDataDrawer(false)}
-          onOpenProfile={() => { onClose(); navigate("/profile"); }}
-        />
-      )}
     </div>
   );
 }
